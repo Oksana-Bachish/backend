@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="col-1 mt-5">
+    {% block model_basket %}
+    {% include 'includes/basket_button.html' %}
+    {% endblock %}
+</div>
+<div class="container col-11">
+    <div class="col-10 border-primary rounded custom-shadow card m-4 p-3">
+        <h3 class="px-3 m-3">Стоимость доставки</h3>
+        <p class="px-3 mx-3">Доставка в пределах МКАД: <strong>390р.</strong></p>
+        <p class="px-3 mx-3">Доставка в пределах ЦКАД: <strong>490р. + 50р./км</strong></p>
+        <p class="px-3 mx-3">Доставка по России: <strong>Временно не доступна</strong></p>
+
+    </div>
+    <div class="col-10 border-primary rounded custom-shadow card m-4 p-3 ">
+        <h3 class="px-3 m-3">Сроки доставки</h3>
+        <p class="px-3 mx-3">Возможные сроки и интервал доставки по Вашему адресу согласовываются при подтверждении заказа с менеджером.
+            Для оформления доставки на завтрашний день, необходимо ее подтвердить сегодня до 19:00.
+            В день приезда курьер предварительно связывается и более конкретно ориентирует по времени доставки.</p>
+
+    </div>
+    <div class="col-10 border-primary rounded custom-shadow card m-4 p-3 ">
+        <h3 class="px-3 m-3">Время доставки: <span class="time-info p-2">8:00 - 21:00</span></h3>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="bg-dark">
+    <div class="container">
+        <p class="m-0 text-left text-white footer-text">© 2025 Унитарное предприятие «Electronics». Все права защищены.*Учебный сайт</p>
+    </div>
+</footer>
+{% endblock %}

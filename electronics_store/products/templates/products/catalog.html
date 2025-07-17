@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load product_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+{% endblock %}
+
+{% block search %}
+<form class="d-flex" role="search" action="{% url 'products:index' category_slug %}" method='get'>
+    <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search">
+    <button class="btn btn-outline-success text-white" type="submit">Поиск</button>
+</form>
+{% endblock %}
+
+{% block content %}
+{% include 'includes/notification.html' %}
+<div class="navbar col-lg-2 col-md-2 col-sm-3 mt-1 mx-3">
+    <div class="drop">
+        <button class="nav-btn"><img src="{% static '/deps/images/filter.jpg' %}" alt="Фильтры" ></button>
+        <div class="nav-list">
+            <form action="{% url 'products:index' category_slug %}" method="get" data-bs-theme="dark">
+                <h4>Фильтры</h4>
+                <p class="fw-weight-bold sidebar my-2">Бренд</p>
+                {% tag_brands as brands %}
+                {% for brand in brands %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="select_brand" value="{{ brand.name }}"
+                           id="{{ brand.slug }}">
+                    <label class="form-check-label" for="{{ brand.slug }}">
+                        {{ brand.name }}
+                    </label>
+                </div>
+                {% endfor %}
+
+                <p class="fw-weight-bold sidebar my-2">Цвет</p>
+                {% tag_products_with_unique_colors as unique_products %}
+                {% for unique_product in unique_products %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="select_color"
+                           value="{{ unique_product.characteristics.color }}"
+                           id="{{ unique_product.characteristics.color }}">
+                    <label class="form-check-label" for="{{ unique_product.characteristics.color }}">
+                        {{ unique_product.characteristics.color }}
+                    </label>
+                </div>
+                {% endfor %}
+
+                <p class="fw-weight-bold sidebar my-2">Объем встроенной памяти</p>
+                {% tag_build_memory as build_memories %}
+                {% for build_memory in build_memories %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="select_build_memory" value="{{ build_memory }}"
+                           id="{{ build_memory }}">
+                    <label class="form-check-label" for="{{ build_memory }}">
+                        {{ build_memory }}
+                    </label>
+                </div>
+                {% endfor %}
+
+                <p class="fw-weight-bold sidebar my-2">Объем оперативной памяти</p>
+                {% tag_access_memory as access_memories %}
+                {% for access_memory in access_memories %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="select_access_memory" value="{{ access_memory }}"
+                           id="{{ access_memory }}">
+                    <label class="form-check-label" for="{{ access_memory }}">
+                        {{ access_memory }}
+                    </label>
+                </div>
+                {% endfor %}
+
+                <p class="fw-weight-bold sidebar my-2">Разрешение камеры</p>
+                {% tag_main_camera as main_cameras %}
+                {% for main_camera in main_cameras %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="select_main_camera" value="{{ main_camera }}"
+                           id="{{ main_camera }}">
+                    <label class="form-check-label" for="{{ main_camera }}">
+                        {{ main_camera }}
+                    </label>
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-dark my-3">Применить</button>
+            </form>
+            <form action="{% url 'products:index' category_slug %}" method="get" data-bs-theme="dark">
+                <button type="submit" class="btn btn-dark my-2">Очистить все</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="col-lg-9 col-md-9 col-sm-9">
+    <!-- Контент на странице -->
+    <div class="row">
+        <div class="d-flex flex-row ">
+            <!-- Форма сортировки -->
+            <div class="dropdown mb-2">
+                <button class="btn btn-secondary dropdown-toggle btn-dark m-2" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                    Сортировка
+                </button>
+                <form action="{% url 'products:index' category_slug %}"
+                      method="get" class="dropdown-menu bg-dark" data-bs-theme="dark">
+                    <div class="form-check text-white mx-3">
+                        <input class="form-check-input" type="checkbox" name="on_sale" id="flexCheckDefault" value="on"
+                               {% if request.GET.on_sale == "on" %} checked {% endif %}>
+                        {% if request.GET.q %}
+                        <input type="hidden" name="q" value="{{ request.GET.q }}">
+                        {% endif %}
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Товары по акции
+                        </label>
+                    </div>
+                    <p class="text-white mx-3 mt-3">Сортировать:</p>
+                    <div class="form-check text-white mx-3">
+                        <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault1" value="default"
+                               {% if not request.GET.order_by or request.GET.order_by == "default" %} checked {% endif %}>
+                        <label class="form-check-label" for="flexRadioDefault1">
+                            По умолчанию
+                        </label>
+                    </div>
+                    <div class="form-check text-white mx-3">
+                        <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault2" value="price"
+                               {% if request.GET.order_by == "price" %} checked {% endif %}>
+                        <label class="form-check-label" for="flexRadioDefault2">
+                            От дешевых к дорогим
+                        </label>
+                    </div>
+                    <div class="form-check text-white mx-3">
+                        <input class="form-check-input" type="radio" name="order_by" id="flexRadioDefault3" value="-price"
+                               {% if request.GET.order_by == "-price" %} checked {% endif %}>
+                        <label class="form-check-label" for="flexRadioDefault3">
+                            От дорогих к дешевым
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary mx-3 mt-3">Применить</button>
+                </form>
+            </div>
+            <!--Кнопка корзины-->
+            <div class="m-2">
+                {% block model_basket %}
+                {% include 'includes/basket_button.html' %}
+                {% endblock %}
+            </div>
+
+        </div>
+        {% if request.GET.q %}
+        <h3 class="'mt-4">Результаты поиска для "{{ request.GET.q }}"</h3>
+        {% endif %}
+        {% if not products %}
+        <link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+        <h2 class="mt-4">По запросу ничего не найдено</h2>
+        {% endif %}
+
+        {% for product in products %}
+        <!-- Карта товара -->
+        <div class="col-lg-4 col-md-6 p-2 ">
+            <div class="card border-0 product-card rounded custom-shadow">
+                {% if product.image %}
+                <a class="link-underline-opacity-0" href="{% url 'products:product' product.slug %}">
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                </a>
+                {% else %}
+                <a class="link-underline-opacity-0" href="{% url 'products:product' product.slug %}">
+                    <img src="{% static 'deps/images/Not_found_image.png' %}" class="card-img-top img-fluid" alt="...">
+                </a>
+                {% endif %}
+                <div class="card-body">
+                    <a class="link-underline-opacity-0" href="{% url 'products:product' product.slug %}">
+                        <p class="card-title">{{ product.name }}</p>
+                    </a>
+                    <p class="card-text text-truncate">{{ product.description }}</p>
+                    <div class="d-flex justify-content-between">
+                        {% if product.discount %}
+                        <p class="px-2 product-price"><strong>{{ product.sell_price }} р.</strong></p>
+                        <p class="text-secondary px-3"><s>{{ product.product_price }}</s> р.</p>
+                        <span class="badge bg-info text-dark">Скидка {{ product.discount }} %</span>
+                        {% else %}
+                        <p class="px-3"><strong>{{ product.product_price }} р.</strong></p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="button-basket">
+                    <a href="{% url 'basket:basket_add' %}" class="btn add-to-cart add_style color-info" data-product-id="{{ product.id }}">{% csrf_token %}
+                        <p class="button-text">В корзину</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<!-- Пагинация -->
+{% if products %}
+<nav aria-label="Page navigation example">
+    <ul class="pagination justify-content-center pag-info">
+        <div class="custom-shadow d-flex my-20">
+            <li class="page-item {% if not page_obj.has_previous %} disabled {% endif %} ">
+                <a class="page-link"
+                   href="{% if page_obj.has_previous %}?{% change_params page=page_obj.previous_page_number %}{% else %}#{% endif %}"><</a>
+            </li>
+
+            {% for page in page_obj.paginator.page_range %}
+            {% if page >= page_obj.number|add:-2 and page <= page_obj.number|add:2 %}
+            <li class="page-item {% if page_obj.number == page %} active {% endif %}">
+                <a class="page-link" href="?{% change_params page=page  %}">{{ page }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            <li class="page-item {% if not page_obj.has_next %} disabled {% endif %} ">
+                <a class="page-link"
+                   href="{% if page_obj.has_next %}?{% change_params page=page_obj.next_page_number %}{% else %}#{% endif %}">></a>
+            </li>
+        </div>
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+
+{% block footer %}
+<footer class="bg-dark">
+    <div class="container">
+        <p class="m-0 text-left text-white footer-text">© 2025 Унитарное предприятие «Electronics». Все права защищены. *Учебный сайт</p>
+    </div>
+</footer>
+{% endblock %}
+

@@ -1,0 +1,15 @@
+venv/
+.pylintrc
+__pycache__/
+cache/
+
+.idea
+
+media/
+sets/
+
+.env.dev
+.env.prod
+
+Dockerfile
+Dockerfile.prod

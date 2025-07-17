@@ -1,0 +1,1 @@
+[{"model": "products.productimage", "pk": 3, "fields": {"product": 1, "image": "products/images2.jpg"}}, {"model": "products.productimage", "pk": 4, "fields": {"product": 1, "image": "products/images1.jpg"}}, {"model": "products.productimage", "pk": 5, "fields": {"product": 3, "image": "products/Снимок_экрана_2025-03-12_151823.jpg"}}]

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container card  col-10 mb-5 mt-2">
+    <h3 class="mx-5 my-2">Оплата</h3>
+    <div class="d-flex">
+        <div class="">
+            {% for item in order_items.all %}
+            {% with product=item.product %}
+            <div class="d-flex">
+                <div class="m-0">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top p-0" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="{% static 'deps/images/Not_found_image.png' %}" class="card-img-top img-fluid" alt="...">
+                    {% endif %}
+                </div>
+                <div>
+                    <div>
+                        <p><strong>{{ product.name }}</strong></p>
+                        <p>Количество: {{ item.quantity }}</p>
+                        {% if product.discount %}
+                        <div class="cart-price">
+                            <p><strong>{{ product.sell_price }} р.</strong></p>
+                        </div>
+                        {% else %}
+                        <p><strong>{{ product.price }} р.</strong></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+            <form action="{% url 'payment:process' %}" method="post" class="payform mb-10">
+                <input type="submit" value="Оплатить сейчас" class="paynow btn color-info mx-5 my-2">
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="bg-dark">
+    <div class="container">
+        <p class="m-0 text-left text-white footer-text">© 2025 Унитарное предприятие «Electronics». Все права защищены.*Учебный сайт</p>
+    </div>
+</footer>
+{% endblock %}

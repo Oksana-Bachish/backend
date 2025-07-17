@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load product_tags %}
+{% load cache %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<div class="col-1 mt-4">
+    {% block model_basket %}
+    {% include 'includes/basket_button.html' %}
+    {% endblock %}
+</div>
+<div class="col-lg-11 col-md-10 col-sm-11">
+    <div class="row justify-content-center">
+        <h3 class="mt-4 text-center"><strong>{{ content }}</strong></h3>
+        {% cache 60 catalog_categories %}
+        {% tag_categories as categories %}
+        {% for category in categories %}
+        <div class="col-lg-3 col-md-3 col-sm-1 pt-5 p-3 m-4 text-center category_card">
+            <a class="link-underline-opacity-0" href="{% url 'products:index' category.slug %}">
+                <img src="{{ category.image.url }}" alt="{{ category.slug }}"
+                     class="img-fluid category-img">
+            </a>
+            <a class="text-black link-opacity-25-hover" href="{% url 'products:index' category.slug %}">{{ category.name }}</a>
+        </div>
+        {% endfor %}
+        {% endcache %}
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="bg-dark">
+    <div class="container">
+        <p class="m-0 text-left text-white footer-text">г.Москва, ул. Тверская, д. 25, кор.5. Тел: +7 915 234-56-78</p>
+        <p class="m-0 text-left text-white footer-text">© 2025 Унитарное предприятие «Electronics».</p>
+        <p class="m-0 text-left text-white-50 footer-text small"> Внимание!
+            Этот сайт создан исключительно в учебных целях и не является коммерческим интернет-магазином.
+            Вся представленная информация, включая изображения и описания товаров, используется для
+            демонстрации и может не соответствовать реальным предложениям и условиям продаж.
+            Любое использование материалов сайта в коммерческих целях без согласия правообладателей запрещено.</p>
+    </div>
+</footer>
+{% endblock %}
+

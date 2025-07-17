@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="col-1 mt-5">
+    {% block model_basket %}
+    {% include 'includes/basket_button.html' %}
+    {% endblock %}
+</div>
+<div class="container col-11">
+    <div class="row mt-1">
+        <div class="col-lg-3 col-md-10 mx-3 my-5 p-3">
+            <img src="{% static '/deps/images/mobileshop.jpg' %}" alt="Фото магазина" class="img-fluid rounded">
+        </div>
+        <div class="col-lg-8 col-md-10  p-2 mx-3 p-3">
+            <h2 class=""><strong>{{ content }}</strong></h2>
+            <div class="border-primary rounded card p-3 border-0">
+                <p>За время существования мы обзавелись большим магазином недалеко от центра Москвы и собственным сервисным
+                    центром, который осуществляет гарантийный ремонт, что особенно важно в наше время.</p>
+                <p>{{ text_on_page }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="bg-dark">
+    <div class="container">
+        <p class="m-0 text-left text-white footer-text">© 2025 Унитарное предприятие «Electronics». Все права
+            защищены. *Учебный сайт</p>
+    </div>
+</footer>
+{% endblock %}
+

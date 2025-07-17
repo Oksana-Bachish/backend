@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="col-1 mt-5">
+    {% block model_basket %}
+    {% include 'includes/basket_button.html' %}
+    {% endblock %}
+</div>
+<div class="container col-11">
+    <div class="col-10 border-primary rounded custom-shadow card m-4 p-3 ">
+        <div class="container col-11">
+            <h3 class="m-3">Контакты</h3>
+            <div class="col-lg-5 col-md-9 col-sm-10 contacts-info p-3">
+                <p>г.Москва, ул. Тверская, д. 25, кор.5.</p>
+                <p>Тел: <strong>+7 915 234-56-78</strong></p>
+            </div>
+            <div class="row justify-content-left">
+                <div class="col-lg-5 col-md-9 col-sm-10 contacts-info m-3 p-3">
+                    <p class="text-center">Режим работы магазина: <strong>Ежедневно 10:00 — 21:00</strong></p>
+                </div>
+                <div class="col-lg-6 col-md-9 col-sm-10 contacts-info m-3 p-3">
+                    <p class="text-center">Режим работы гарантийного отдела: <strong>Ежедневно 10:00 — 21:00</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="text-center">
+            <h6 class="mx-5">Мы в соц.сетях</h6>
+            <a href="#"><img src="{% static '/deps/images/telegram.jpg' %}" alt="Telegram" class="social_media"></a>
+            <a href="#"><img src="{% static '/deps/images/instagram.jpg' %}" alt="Instagram" class="social_media"></a>
+            <a href="#"><img src="{% static '/deps/images/viber.png' %}" alt="Viber" class="social_media"></a>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="bg-dark">
+    <div class="container">
+        <p class="m-0 text-left text-white footer-text">© 2025 Унитарное предприятие «Electronics». Все права
+            защищены.*Учебный сайт</p>
+    </div>
+</footer>
+{% endblock %}
