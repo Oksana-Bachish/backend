@@ -35,6 +35,8 @@ services:
       - email_host_password
     depends_on:
       - db
+    networks:
+      - app_net
 
   db:
     image: postgres:17-bookworm
@@ -49,18 +51,26 @@ services:
       - POSTGRES_PASSWORD=/run/secrets/pg_password
     secrets:
       - pg_password
+    networks:
+      - app_net
 
   nginx:
     image: nginx:alpine-slim
     volumes:
       - ./conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot
       - static_volume:/electronics_store/static
       - static_api_volume:/electronics_store/api-static
       - media_volume:/electronics_store/media
     ports:
       - 80:80
+      - 443:443
     depends_on:
       - web
+      - api
+    networks:
+      - app_net
 
   api:
     build: ./api
@@ -84,6 +94,8 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+    networks:
+      - app_net
 
 secrets:
   pg_password:
@@ -102,3 +114,6 @@ volumes:
   static_volume:
   static_api_volume:
   media_volume:
+
+networks:
+  app_net:
