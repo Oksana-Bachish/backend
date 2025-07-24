@@ -19,7 +19,6 @@ else:
 if os.environ.get('CSRF_TRUSTED_ORIGINS'):  # если происходит проксирование
     CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS').split()
 
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -136,7 +135,6 @@ else:
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = '/user/login/'
@@ -145,9 +143,7 @@ LOGIN_REDIRECT_URL = '/'
 STRIPE_PUBLISHABLE_KEY = read_secret('stripe_publishable_key') or os.environ.get('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = read_secret('stripe_secret_key') or os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_API_VERSION = os.environ.get('STRIPE_API_VERSION')
-
 STRIPE_WEBHOOK_SECRET = read_secret('stripe_webhook_secret') or os.environ.get('STRIPE_WEBHOOK_SECRET')
-
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.yandex.ru'
@@ -162,6 +158,7 @@ EMAIL_ADMIN = EMAIL_HOST_USER
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -189,5 +186,3 @@ LOGGING = {
         },
     },
 }
-
-
