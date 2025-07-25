@@ -1,15 +1,15 @@
 #!/bin/sh
 
-if [ "$POSTGRES_DB" = "electronics_store" ]
-then
-    echo "Ждем postgres..."
+mkdir -p /app/logs
+touch /app/logs/django.log
 
-    while ! nc -z "db" $POSTGRES_PORT; do
-      sleep 0.5
-    done
+echo "Ожидание запуска PostgreSQL..."
 
-    echo "PostgreSQL запущен"
-fi
+while ! nc -z "db" "$POSTGRES_PORT"; do
+  sleep 0.5
+done
+
+echo "PostgreSQL запущен"
 
 python manage.py makemigrations
 python manage.py migrate
