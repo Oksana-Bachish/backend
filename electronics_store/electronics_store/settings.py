@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 if os.environ.get('ALLOWED_HOSTS'):  # если приложение работает на сервере
     ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split()
