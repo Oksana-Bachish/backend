@@ -1,6 +1,8 @@
 #!/bin/sh
 
-python manage.py collectstatic --noinput
+if [ "$DEBUG" = "False" ]; then
+    python manage.py collectstatic --noinput
+fi
 
 python manage.py migrate --noinput
 
