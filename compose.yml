@@ -10,23 +10,13 @@ services:
       - static_volume:/usr/src/electronics_store/staticfiles
       - ./electronics_store:/usr/src/electronics_store
       - media_volume:/usr/src/electronics_store/media
-    develop:
-      watch:
-        - action: sync
-          path: ./electronics_store
-          target: /usr/src/electronics_store
-          ignore:
-            - venv/
-        - action: rebuild
-          path: ./electronics_store/requirements.txt
-        - action: rebuild
-          path: ./electronics_store/entrypoint.sh
     restart: unless-stopped # no, always, on-failure: 5
-
     env_file:
       - ./electronics_store/.env.dev
     depends_on:
       - db
+    networks:
+      - dev
 
   db:
     image: postgres:17-bookworm
@@ -36,10 +26,8 @@ services:
     restart: unless-stopped
     env_file:
       - ./electronics_store/.env.dev
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+    networks:
+      - dev
 
   dbbrowser:
     image: adminer
@@ -49,6 +37,8 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+    networks:
+      - dev
 
   api:
     build: ./api
@@ -69,9 +59,14 @@ services:
     restart: unless-stopped
     depends_on:
       - db
+    networks:
+      - dev
 
 volumes:
   data:
   static_volume:
   static_api_volume:
   media_volume:
+
+networks:
+  dev:
