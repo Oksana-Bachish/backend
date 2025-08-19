@@ -29,12 +29,10 @@ class UserLoginView(LoginView):
         if user:
             auth.login(self.request, user)
             if session_key:
-                forgot_carts = Basket.objects.filter(user=user)
-                if forgot_carts.exists():
-                    forgot_carts.delete()
-                    Basket.objects.filter(session_key=session_key).update(user=user)
-                    messages.success(self.request, f'{user.username}, Вы вошли в аккаунт')
-                    return HttpResponseRedirect(self.get_success_url())
+                Basket.objects.filter(user=user).delete()
+                Basket.objects.filter(session_key=session_key).update(user=user)
+            messages.success(self.request, f'{user.username}, Вы вошли в аккаунт')
+            return HttpResponseRedirect(self.get_success_url())
         return super(UserLoginView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
