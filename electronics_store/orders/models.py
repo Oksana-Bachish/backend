@@ -1,7 +1,5 @@
+from decimal import Decimal, ROUND_HALF_UP
 from django.db import models
-
-from django.db import models
-
 from products.models import Products
 from users.models import User
 
@@ -53,8 +51,7 @@ class OrderItem(models.Model):
     objects = OrderitemQueryset.as_manager()
 
     def products_price(self):
-        price = self.product.sell_price().replace(" ", "")
-        return round(int(price) * self.quantity, 2)
+        return (self.price * self.quantity).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     def __str__(self):
         return f'Товар {self.name} | Заказ № {self.order.pk}'
