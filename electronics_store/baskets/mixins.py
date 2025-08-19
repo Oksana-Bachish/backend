@@ -26,7 +26,7 @@ class BasketMixin:
 
         # if referer page is create_order and key orders: True to context
         referer = request.META.get('HTTP_REFERER')
-        if reverse('orders:create_order') in referer:
+        if referer and reverse('orders:create_order') in referer:
             context['order'] = True
 
         return render_to_string('baskets/includes/included_basket.html', context, request=request)
