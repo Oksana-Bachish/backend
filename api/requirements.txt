@@ -24,4 +24,5 @@ wcwidth==0.2.10
 gunicorn
 djangorestframework
 django-cors-headers
-
+pytest-django
+coverage>=7.0
