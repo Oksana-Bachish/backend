@@ -1,3 +1,9 @@
+# Electronics Store
+
+[![CI](https://github.com/Oksana-Bachish/backend/actions/workflows/tests.yml/badge.svg)](https://github.com/Oksana-Bachish/backend/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/Oksana-Bachish/backend/branch/main/graph/badge.svg)](https://codecov.io/gh/Oksana-Bachish/backend)
+
+
 # Интернет магазин Electronics_store
 Это полноценный проект интернет-магазина, разработанный на Django. Выполнен как учебный проект в процессе самообучения. 
 
@@ -83,6 +89,8 @@ POSTGRES_DB=db_name
 POSTGRES_PASSWORD=password
 POSTGRES_USER=login
 POSTGRES_PORT=5432
+STRIPE_SECRET_KEY=key
+STRIPE_API_VERSION=version
 ```
 
 6. Создайте файл `.env.dev` в папке API-микросервиса:
@@ -114,7 +122,9 @@ docker compose up
 ```
 
 10. Откройте сайт в браузере:  
-[http://127.0.0.1:8000](http://127.0.0.1:8000)
+- Веб-интерфейс: [http://127.0.0.1:8000](http://127.0.0.1:8000)  
+- API: [http://127.0.0.1:9000/api/v1/products/](http://127.0.0.1:9000/api/v1/products/)
+    
 
 
 ### 🌐 Деплой проекта
@@ -125,4 +135,5 @@ docker compose up
 **API**: https://electronics7.ru/api/v1/products/
 
 ### 👩‍💻 Автор:
-*Оксана Бачиш*
+*Оксана Бачиш*  
+https://github.com/Oksana-Bachish?tab=repositories
