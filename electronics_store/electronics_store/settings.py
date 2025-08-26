@@ -7,7 +7,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'test_secret_key_for_ci')
 
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
@@ -86,8 +86,8 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': read_secret('pg_password') or os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': os.environ.get('POSTGRES_PORT'),
+        'HOST': os.environ.get('POSTGRES_HOST', 'db'),
+        'PORT': os.environ.get('POSTGRES_PORT', 5432),
     }
 }
 
@@ -184,3 +184,18 @@ LOGGING = {
         },
     },
 }
+
+# В GitHub Actions лог в файл не пишем — оставляем только консоль
+if os.getenv("GITHUB_ACTIONS") == "true":
+    LOGGING.get('handlers', {}).pop('file', None)
+    for logger_cfg in LOGGING.get('loggers', {}).values():
+        handlers = logger_cfg.get('handlers', [])
+        logger_cfg['handlers'] = [h for h in handlers if h != 'file']
+        if not logger_cfg['handlers']:
+            logger_cfg['handlers'] = ['console']
+    if 'root' in LOGGING:
+        root_handlers = LOGGING['root'].get('handlers', [])
+        LOGGING['root']['handlers'] = [h for h in root_handlers if h != 'file'] or ['console']
+    if 'console' not in LOGGING.get('handlers', {}):
+        LOGGING.setdefault('handlers', {})['console'] = {'class': 'logging.StreamHandler'}
+

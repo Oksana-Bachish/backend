@@ -1,8 +1,7 @@
 # Electronics Store
 
 [![CI](https://github.com/Oksana-Bachish/backend/actions/workflows/tests.yml/badge.svg)](https://github.com/Oksana-Bachish/backend/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/Oksana-Bachish/backend/branch/main/graph/badge.svg)](https://codecov.io/gh/Oksana-Bachish/backend)
-
+[![codecov](https://codecov.io/gh/oksana-bachish/backend/branch/main/graph/badge.svg)](https://codecov.io/gh/oksana-bachish/backend)
 
 # Интернет магазин Electronics_store
 Это полноценный проект интернет-магазина, разработанный на Django. Выполнен как учебный проект в процессе самообучения. 
@@ -16,6 +15,7 @@
 - Корзина с динамическим обновлением (AJAX)
 - Оформление заказов с оплатой через Stripe (тестовая интеграция)
 - Перевод на Class-Based Views
+- Автоматическое тестирование с покрытием кода
 - Подключение микросервиса через Django REST Framework.
 - Развёртывание в Docker с использованием Nginx
 - Деплой на VPS-сервер
@@ -137,3 +137,4 @@ docker compose up
 ### 👩‍💻 Автор:
 *Оксана Бачиш*  
 https://github.com/Oksana-Bachish?tab=repositories
+
