@@ -1,0 +1,16 @@
+[run]
+source = /usr/src/electronics_store
+branch = True
+
+[report]
+omit =
+    */tests/*
+    */migrations/*
+    electronics_store/*
+    manage.py
+
+
+[paths]
+source =
+    .
+    /usr/src/electronics_store

@@ -17,23 +17,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-#      - name: Fix entrypoint.sh
-#        run: |
-#          dos2unix electronics_store/entrypoint.sh
-#          chmod +x electronics_store/entrypoint.sh
-
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: 3.10.12
-
       - name: Create temporary env file
         run: |
           mkdir -p electronics_store
           cat <<EOF > electronics_store/.env.dev
           SECRET_KEY=test_secret_key_for_ci
           DJANGO_SETTINGS_MODULE=electronics_store.settings
-          POSTGRES_HOST=postgres
+          POSTGRES_HOST=db
           POSTGRES_PORT=5432
           POSTGRES_USER=postgres
           POSTGRES_PASSWORD=postgres
@@ -59,36 +49,23 @@ jobs:
 
       - name: Prepare logs folder
         run: |
-            docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm \
-            -v logs_volume:/usr/src/electronics_store/logs web mkdir -p /usr/src/electronics_store/logs
-
-#          docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm --entrypoint "" \
-#            -v logs_volume:/app/logs web mkdir -p /app/logs
+          docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm \
+          -v logs_volume:/usr/src/electronics_store/logs web mkdir -p /usr/src/electronics_store/logs
 
       - name: Run migrations
         run: |
           docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm  \
             -v logs_volume:/usr/src/electronics_store/logs web python manage.py migrate
-#          docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm web python manage.py migrate
-
-#      - name: Run tests with coverage
-#        run: |
-#          docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm web pytest --ds=electronics_store.settings --cov=electronics_store --cov-report=xml:electronics_store/coverage.xml
-#
-#      - name: Copy coverage.xml out of container
-#        run: |
-#          docker cp $(docker ps -alq):/tmp/coverage.xml electronics_store/coverage.xml
 
       - name: Run tests with coverage
         run: |
-          docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm \
-            -v logs_volume:/usr/src/electronics_store/logs web pytest --ds=electronics_store.settings \
-            --cov=electronics_store --cov-report=xml:/tmp/coverage.xml
-#          docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm --entrypoint "" web pytest --ds=electronics_store.settings --cov=electronics_store --cov-report=xml:electronics_store/coverage.xml
-
-      - name: Copy coverage.xml out of container
-        run: |
-          docker cp $(docker ps -alq):/tmp/coverage.xml electronics_store/coverage.xml
+         docker compose -f compose.yml --env-file electronics_store/.env.dev run --rm \
+         -v logs_volume:/usr/src/electronics_store/logs \
+         -v $(pwd)/electronics_store:/tmp_host \
+         web pytest --ds=electronics_store.settings \
+         --cov=/usr/src/electronics_store \
+         --cov-config=/usr/src/electronics_store/.coveragerc \
+         --cov-report=xml:/tmp_host/coverage.xml -o log_cli=true -o log_cli_level=INFO
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -100,101 +77,3 @@ jobs:
 
       - name: Show coverage.xml
         run: cat electronics_store/coverage.xml
-
-#      - name: Stop containers
-#        run: docker compose -f compose.yml down -v
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#name: Django CI
-#
-#on:
-#  push:
-#    branches: [ main ]
-#  pull_request:
-#    branches: [ main ]
-#
-#jobs:
-#  test:
-#    runs-on: ubuntu-latest
-#
-#    services:
-#      postgres:
-#        image: postgres:17-bookworm
-#        env:
-#          POSTGRES_USER: postgres
-#          POSTGRES_PASSWORD: postgres
-#          POSTGRES_DB: test_db
-#        ports:
-#          - 5432:5432
-#        options: >-
-#          --health-cmd="pg_isready -U postgres"
-#          --health-interval=10s
-#          --health-timeout=5s
-#          --health-retries=5
-#
-#    env:
-#      SECRET_KEY: 'test_secret_key_for_ci'
-#      DJANGO_SETTINGS_MODULE: electronics_store.settings
-#      POSTGRES_HOST: 127.0.0.1
-#      POSTGRES_PORT: 5432
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: test_db
-#
-#    steps:
-#      - uses: actions/checkout@v3
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: 3.10.12
-#
-#      - name: Install dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install -r electronics_store/requirements.txt
-#          pip install pytest pytest-django pytest-cov
-#
-#      - name: Run migrations
-#        run: |
-#          cd electronics_store
-#          python manage.py migrate
-#
-#      - name: Run tests with coverage
-#        run: |
-#          cd electronics_store
-#          pytest --ds=electronics_store.settings --cov=electronics_store --cov-report=xml:coverage.xml
-#
-#      - name: Upload coverage to Codecov
-#        uses: codecov/codecov-action@v5
-#        with:
-#          files: electronics_store/coverage.xml
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          fail_ci_if_error: true
-#          flags: unittests
-#
-#      - name: Show coverage.xml
-#        run: |
-#          cat electronics_store/coverage.xml
