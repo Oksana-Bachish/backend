@@ -1,0 +1,5 @@
+# Ensure LF for shell scripts
+*.sh text eol=lf
+
+# Normalize Python files
+*.py text eol=lf
