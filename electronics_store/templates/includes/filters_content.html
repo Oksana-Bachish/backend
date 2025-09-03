@@ -1,0 +1,63 @@
+{% load product_tags %}
+
+<form action="{% url 'products:index' category_slug %}" method="get" data-bs-theme="dark">
+    <h5 class="fw-bold sidebar mt-3">Бренд</h5>
+    {% tag_brands as brands %}
+    {% for brand in brands %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="select_brand"
+               value="{{ brand.name }}" id="{{ brand.slug }}">
+        <label class="form-check-label" for="{{ brand.slug }}">{{ brand.name }}</label>
+    </div>
+    {% endfor %}
+
+    <h5 class="fw-bold sidebar mt-3">Цвет</h5>
+    {% tag_products_with_unique_colors as unique_products %}
+    {% for unique_product in unique_products %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="select_color"
+               value="{{ unique_product.characteristics.color }}"
+               id="{{ unique_product.characteristics.color }}">
+        <label class="form-check-label" for="{{ unique_product.characteristics.color }}">
+            {{ unique_product.characteristics.color }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <h5 class="fw-bold sidebar mt-3">Объем встроенной памяти</h5>
+    {% tag_build_memory as build_memories %}
+    {% for build_memory in build_memories %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="select_build_memory"
+               value="{{ build_memory }}" id="{{ build_memory }}">
+        <label class="form-check-label" for="{{ build_memory }}">{{ build_memory }}</label>
+    </div>
+    {% endfor %}
+
+    <h5 class="fw-bold sidebar mt-3">Объем оперативной памяти</h5>
+    {% tag_access_memory as access_memories %}
+    {% for access_memory in access_memories %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="select_access_memory"
+               value="{{ access_memory }}" id="{{ access_memory }}">
+        <label class="form-check-label" for="{{ access_memory }}">{{ access_memory }}</label>
+    </div>
+    {% endfor %}
+
+    <h5 class="fw-bold sidebar mt-3">Разрешение камеры</h5>
+    {% tag_main_camera as main_cameras %}
+    {% for main_camera in main_cameras %}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="select_main_camera" value="{{ main_camera }}"
+               id="{{ main_camera }}">
+        <label class="form-check-label" for="{{ main_camera }}">
+            {{ main_camera }}
+        </label>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-dark my-3 w-100">Применить</button>
+</form>
+<form action="{% url 'products:index' category_slug %}" method="get" data-bs-theme="dark">
+    <button type="submit" class="btn btn-outline-secondary w-100">Очистить все</button>
+</form>

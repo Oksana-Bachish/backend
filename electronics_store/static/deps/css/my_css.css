@@ -1,21 +1,42 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 body {
+  display: flex;
+  flex-direction: column;
   background-color: #e1e9f2;
   min-height: 100%;
-  position: relative;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
 }
 
 .main {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  flex: 1;
 }
 
 a {
   text-decoration: none;
 }
 
+.container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.flex-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start; /* выравнивание по верхнему краю */
+}
+
 input[type=checkbox]{
   accent-color: green;
+}
+
+.col-md-auto.d-flex {
+  margin-top: 1rem;
 }
 
 .dropdown-toggle::after {
@@ -23,7 +44,19 @@ input[type=checkbox]{
 }
 
 .custom-shadow {
-  box-shadow: 2px 2px 15px 0px #000000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  background-color: #fdfdfd;
+}
+
+.btn-green {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: #fff;
+}
+
+.btn-green:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
 }
 
 .color-info {
@@ -53,28 +86,51 @@ input[type=checkbox]{
 }
 
 .card {
-  background-color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  background-color: #ffffff;
+  padding: 2rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .card-img-top {
-  height: 20em;  /* Адаптируйте под необходимые параметры */
+  object-fit: cover;
+  height: 18em;
   object-fit: contain;
-  width: 80%; /* Изображение занимает всю доступную ширину */
-  padding: 1em;
+  width: 80%;
+  padding: 0.5em;
   justify-content: center;
   margin-left: 2.5em;
+}
+
+.add-to-cart {
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.add-to-cart:hover {
+  background-color: #218838;
 }
 
 .card-title {
   color: #070808;
   text-align: left;
-  font-size: 20px;
+  font-size: 18px;
   text-decoration: none;
 }
 
 .card-text {
-  margin: 0.1em 0em;
-  color: grey;
+  font-size: 0.9rem;
+  color: #555;
+  height: 2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-img {
@@ -95,8 +151,23 @@ input[type=checkbox]{
   font-size: 20px;
 }
 
+h5.card-title {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+
 .product-card {
   height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.25);
 }
 
 .product-price {
@@ -110,6 +181,35 @@ input[type=checkbox]{
   border-radius: 1em;
 }
 
+.product-details {
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+    transition: box-shadow 0.3s ease;
+}
+
+.product-details:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.product-details .card-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.product-details .char-text-main {
+    color: #28a745;
+    font-size: 1.4rem;
+}
+
+.product-details .btn.add-to-cart {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+}
+
 .button-basket {
   width: 100%;
   display: block;
@@ -120,6 +220,20 @@ input[type=checkbox]{
   border-color: #212429;
   border-radius: 0.3em;
   opacity: 0.9;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.button-basket a.btn {
+  width: 100%;
+  padding: 0.4rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.button-basket:hover {
+  background-color: #28c76f;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .button-text {
@@ -138,12 +252,43 @@ input[type=checkbox]{
 .category_card {
   background-color: white;
   height: 24em;
+  border-radius: 1em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category_card a {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.category_card a:hover {
+  color: #28a745;
+}
+
+.category_card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(145deg, #ffffff, #f0f8ff);
 }
 
 .category-img {
-  height: 15em;  /* Адаптируйте под необходимые параметры */
+  height: 14em;
   object-fit: contain;
-  width: 20em; /* Изображение занимает всю доступную ширину */
+  width: 100%;
+  transition: transform 0.3s ease;
+  padding: 1em;
+}
+
+.category_card:hover .category-img {
+  transform: scale(1.05);
+}
+
+.row.categories-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
 }
 
 .time-info {
@@ -198,43 +343,92 @@ input[type=checkbox]{
   display: none;
 }
 
-
-@media (max-width: 764px) {
-  .nav-btn {
-    display: block;
-    border: none;
-    height: 2.5em;
-    width: 2.5em;
-    margin: 0;
-    padding: 0;
-    cursor: pointer;
-  }
-
-  .nav-btn:hover {
-    opacity: 0.8;
-  }
-
-  .nav-btn img {
-    height: 2.5em;
-    width: 2.5em;
-    border-radius: 0.8em;
-  }
-
-  .nav-list {
-    display: none;
-  }
-
-  .drop:hover .nav-list {
-    display: block;
-    /* position: absolute; */
-    background-color: #e1e9f2;
-  }
-
-  .drop:active .nav-list {
-    display: block;
-    /* position: absolute; */
-    background-color: #e1e9f2;
-  }
-
+.navbar.col-lg-3 {
+  height: 100vh;
+  overflow-y: auto;      /* чтобы был скролл, если контента много */
+  color: white;
+  position: sticky;      /* фиксируем сверху при прокрутке */
+  top: 0;
+  color: #333;
 }
 
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #dee2e6;
+}
+
+.accordion-button {
+  font-weight: 500;
+  background-color: #e9f6ef;
+  color: #333;
+}
+
+.accordion-body {
+  background-color: #fefefe;
+}
+
+.table-dark {
+  background-color: #343a40;
+}
+
+.table-dark td, .table-dark th {
+  color: #fff;
+}
+
+.table-dark a {
+  color: #9ef3b0;
+  text-decoration: underline;
+}
+
+.btn-dark {
+    background-color: #343a40;
+    border-color: #343a40;
+}
+
+.btn-dark:hover {
+    background-color: #495057;
+    border-color: #495057;
+}
+
+.pagination .page-item.disabled .page-link {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #198754;
+    border-color: #198754;
+    color: white;
+}
+
+.pag-info > div {
+    display: flex;
+    gap: 0.25rem;
+
+#filtersCollapse {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+@media (min-width: 992px) {
+  .navbar.col-lg-3 {
+    height: 100vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+  }
+}
+
+/* Для мобильных */
+@media (max-width: 991.98px) {
+  .navbar.col-lg-3 .collapse {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}

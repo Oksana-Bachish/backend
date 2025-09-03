@@ -3,6 +3,10 @@
 
 {% load baskets_tags %}
 
+{% block css %}
+<link rel="stylesheet" href="{% static 'deps/css/my_footer_css.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="container col-10 mt-5">
@@ -18,5 +22,14 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block footer %}
+<footer class="bg-dark">
+    <div class="container">
+        <p class="m-0 text-left text-white footer-text">© 2025 Унитарное предприятие «Electronics». Все права
+            защищены.*Учебный сайт</p>
+    </div>
+</footer>
 {% endblock %}
 

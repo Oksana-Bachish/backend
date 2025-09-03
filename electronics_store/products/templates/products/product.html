@@ -5,90 +5,104 @@
 <html lang="en">
 
 {% block content %}
-<div class="col-1 mt-2">
-    {% block model_basket %}
-    {% include 'includes/basket_button.html' %}
-    {% endblock %}
-</div>
-<div class="container card col-10 mt-2">
-    <div class="row mt-1">
-        <div class="col-lg-4 col-md-6 col-sm-12 mt-3">
-            <!-- Миниатюры -->
+<div class="container mt-3">
+  <div class="row">
+    <!-- Кнопка корзины -->
+    <div class="col-12 col-md-1 mb-2">
+      {% block model_basket %}
+      {% include 'includes/basket_button.html' %}
+      {% endblock %}
+    </div>
+
+    <!-- Контент -->
+    <div class="col-12 col-md-11 mt-2">
+      <div class="card shadow-sm rounded-4 p-4">
+        <div class="row">
+          <!-- Карусель изображений -->
+          <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
             <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    {% for image in product.get_images %}
-                    {% if forloop.counter0 == 0  %}
-                    <div class="carousel-item active" data-interval="150">
-                        <img src="{{ image.image.url }}" class="card-img" alt="">
-                    </div>
-                    {% else %}
-                    <div class="carousel-item">
-                        <img src="{{ image.image.url }}" class="card-img" alt="">
-                    </div>
-                    {% endif %}
-                    {% endfor %}
+              <div class="carousel-inner rounded-3">
+                {% for image in product.get_images %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <img src="{{ image.image.url }}"
+                       class="d-block w-100 img-fluid"
+                       style="height: 300px; object-fit: contain; border-radius: 8px;"
+                       alt="Фото товара">
                 </div>
-                <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only"><</span>
-                </a>
-                <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">></span>
-                </a>
+                {% endfor %}
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
             </div>
+          </div>
+          <!-- Описание товара -->
+          <div class="col-lg-8 col-md-6 col-sm-12 product-details">
+            <h2 class="card-title fw-bold">{{ product.name }}</h2>
+            <p class="card-text mt-3">Цена со скидкой:
+              <strong><span class="text-success fs-5">{{ product.sell_price }} р.</span></strong>
+            </p>
+            <p class="card-text text-muted">Полная цена: <span class="text-decoration-line-through">{{ product.price }} р.</span></p>
+            <p class="card-text">Скидка: <span class="text-danger">{{ product.discount }}%</span></p>
+
+            <a href="{% url 'basket:basket_add' %}"
+               class="btn btn-success w-50 mt-4 add-to-cart"
+               data-product-id="{{ product.id }}">
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"> Добавить в корзину
+            </a>
+          </div>
+
         </div>
-        <!-- Описание товара -->
-        <div class="col-lg-6 col-md-6 col-sm-12 p-2 mt-3 card-body">
-            <h2 class="card-title">{{ product.name }}</h2>
-            <p class="card-text mt-3">Цена со скидкой: <strong><span class="char-text-main">{{ product.sell_price }} р.</span></strong></p>
-            <p class="card-text mt-3">Полная цена: <span class="char-text">{{ product.price }} р.</span></p>
-            <p class="card-text mt-3">Скидка: <span class="char-text">{{ product.discount }} %</span></p>
-            <a href="{% url 'basket:basket_add' %}" class="btn add-to-cart color-info w-25 mt-3" data-product-id="{{ product.id }}">{% csrf_token %} Добавить в корзину</a>
+      </div>
+
+      <!-- Характеристики -->
+      <div class="accordion mt-4" id="productSpecsAccordion">
+        <div class="accordion-item rounded-3 shadow-sm">
+          <h2 class="accordion-header" id="headingSpecs">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapseSpecs" aria-expanded="true" aria-controls="collapseSpecs">
+              Все характеристики
+            </button>
+          </h2>
+          <div id="collapseSpecs" class="accordion-collapse collapse show"
+               aria-labelledby="headingSpecs" data-bs-parent="#productSpecsAccordion">
+            <div class="accordion-body py-2 small">
+              <p>Код товара: <span class="char-text">{{ product.display_id }}</span></p>
+              <p>Операционная система: <span class="char-text">{{ product.characteristics.operating_system }}</span></p>
+              {% if product.characteristics.type_operating_system %}<p>Тип ОС: <span class="char-text">{{ product.characteristics.type_operating_system }}</span></p>{% endif %}
+              {% if product.characteristics.main_camera %}<p>Основная камера: <span class="char-text">{{ product.characteristics.main_camera }} Мп</span></p>{% endif %}
+              {% if product.characteristics.front_camera %}<p>Фронтальная камера: <span class="char-text">{{ product.characteristics.front_camera }} Мп</span></p>{% endif %}
+              {% if product.characteristics.video_resolution %}<p>Разрешение видео: <span class="char-text">{{ product.characteristics.video_resolution }}K</span></p>{% endif %}
+              <p>Память: <span class="char-text">{{ product.characteristics.built_in_memory }} ГБ / {{ product.characteristics.random_access_memory }} ГБ (ОЗУ)</span></p>
+              <p>Дисплей: <span class="char-text">{{ product.characteristics.screen_diagonal }}" / {{ product.characteristics.display_features }} Гц</span></p>
+              {% if product.characteristics.processor %}<p>Процессор: <span class="char-text">{{ product.characteristics.processor }}</span></p>{% endif %}
+              {% if product.characteristics.number_of_cores %}<p>Ядер: <span class="char-text">{{ product.characteristics.number_of_cores }}</span></p>{% endif %}
+              {% if product.characteristics.processor_frequency %}<p>Частота: <span class="char-text">{{ product.characteristics.processor_frequency }}</span></p>{% endif %}
+              <p>Цвет: <span class="char-text">{{ product.characteristics.color }}</span></p>
+              <p>Габариты: <span class="char-text">{{ product.characteristics.dimensions }}</span>, {{ product.characteristics.weight }} г.</p>
+              {% if product.characteristics.quantity_of_SIM %}<p>SIM: <span class="char-text">{{ product.characteristics.quantity_of_SIM }} x {{ product.characteristics.sim_card_type }}</span></p>{% endif %}
+              {% if product.characteristics.bluetooth %}<p>Bluetooth: <span class="char-text">{{ product.characteristics.bluetooth }}</span></p>{% endif %}
+              <p>Wi-Fi: <span class="char-text">{{ product.characteristics.wi_fi }}</span></p>
+              <p>Разъем: <span class="char-text">{{ product.characteristics.connection_connector }}</span></p>
+              <p>Батарея: <span class="char-text">{{ product.characteristics.battery_capacity }} мАч</span></p>
+            </div>
+          </div>
         </div>
+      </div>
+
     </div>
-    <div>
-        <h5 class="card-title mx-3">Все характеристики</h5>
-        <p class="card-text">Код товара: <span class="char-text">{{ product.display_id }}</span></p>
-
-        <p class="card-text mt-3">Операционная система: <span class="char-text">{{ product.characteristics.operating_system }}</span></p>
-        {% if product.characteristics.type_operating_system %}<p class="card-text">Тип операционной системы: <span class="char-text">{{ product.characteristics.type_operating_system }}</span></p>{% endif %}
-
-        {% if product.characteristics.main_camera %}<p class="card-text mt-3">Основная камера: <span class="char-text">{{ product.characteristics.main_camera }} Мп</span></p>{% endif %}
-        {% if product.characteristics.front_camera %}<p class="card-text">Фронтальная камера: <span class="char-text">{{ product.characteristics.front_camera }} Мп</span></p>{% endif %}
-        {% if product.characteristics.video_resolution %}<p class="card-text">Разрешение видео: <span class="char-text">{{ product.characteristics.video_resolution }}К</span></p>{% endif %}
-
-        <p class="card-text mt-3">Объем встроенной памяти: <span class="char-text">{{ product.characteristics.screen_diagonal }} ГБ</span></p>
-        <p class="card-text">Объем оперативной памяти: <span class="char-text">{{ product.characteristics.random_access_memory }} ГБ</span></p>
-
-        <p class="card-text mt-3">Диагональ дисплея: <span class="char-text">{{ product.characteristics.screen_diagonal }}"</span></p>
-        <p class="card-text">Особенности дисплея: <span class="char-text">{{ product.characteristics.display_features }} Гц</span></p>
-
-        {% if product.characteristics.processor %}<p class="card-text mt-3">Процессор: <span class="char-text">{{ product.characteristics.processor }}</span></p>{% endif %}
-        {% if product.characteristics.number_of_cores %}<p class="card-text">Количество ядер: <span class="char-text">{{ product.characteristics.number_of_cores }}</span></p>{% endif %}
-        {% if product.characteristics.processor_frequency %}<p class="card-text">Частота процессора: <span class="char-text">{{ product.characteristics.processor_frequency }}</span></p>{% endif %}
-
-        <p class="card-text mt-3">Цвет: <span class="char-text">{{ product.characteristics.color }}</span></p>
-        <p class="card-text">Габариты: <span class="char-text">{{ product.characteristics.dimensions }}</span></p>
-        <p class="card-text">Вес: <span class="char-text">{{ product.characteristics.weight }} г.</span></p>
-
-
-        {% if product.characteristics.quantity_of_SIM %}<p class="card-text mt-3">Количество SIM карт: <span class="char-text">{{ product.characteristics.quantity_of_SIM }}</span></p>{% endif %}
-        {% if product.characteristics.sim_card_type %}<p class="card-text">Тип SIM карты: <span class="char-text">{{ product.characteristics.sim_card_type }}</span></p>{% endif %}
-
-        {% if product.characteristics.bluetooth %}<p class="card-text mt-3">Bluetooth: <span class="char-text">{{ product.characteristics.bluetooth }}</span></p>{% endif %}
-        <p class="card-text">Wi-Fi: <span class="char-text">{{ product.characteristics.wi_fi }}</span></p>
-        <p class="card-text">Разъем подключения: <span class="char-text">{{ product.characteristics.connection_connector }}</span></p>
-
-        <p class="card-text my-3">Емкость аккумулятора: <span class="char-text mt-3">{{ product.characteristics.battery_capacity }} мАч</span></p>
-    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block footer %}
 <footer class="bg-dark">
     <div class="container">
-        <p class="m-0 text-left text-white footer-text">г.Москва, ул. Тверская, д. 25, кор.5. Тел: +7 915 234-56-78</p>
         <p class="m-0 text-left text-white footer-text">© 2025 Унитарное предприятие «Electronics». Все права защищены. *Учебный сайт</p>
     </div>
 </footer>

@@ -1,94 +1,90 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap & Custom Styles -->
     <link rel="stylesheet" href="{% static 'deps/css/bootstrap/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'deps/css/my_css.css' %}">
     {% block css %}{% endblock %}
-    <!-- Favicons для разных платформ -->
+
+    <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'deps/favicon/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'deps/favicon/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'deps/favicon/favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'deps/favicon/site.webmanifest' %}">
-    <title>{{ title }}</title>
 </head>
 
-<body>
-<header class="main">
-    <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+<body class="bg-light">
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'main:index' %}">Electronics</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand fw-bold text-uppercase" href="{% url 'main:index' %}">Electronics</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item dropdown ">
-                        <a class="nav-link dropdown-toggle text-white" href="#" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Информация
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item  text-white" href="{% url 'main:delivery' %}">Доставка и оплата</a></li>
-                            <li><a class="dropdown-item  text-white" href="{% url 'main:contacts' %} ">Контактная информация</a></li>
-                            <li><a class="dropdown-item  text-white" href="{% url 'main:about' %}">Про нас</a></li>
+                            <li><a class="dropdown-item" href="{% url 'main:delivery' %}">Доставка и оплата</a></li>
+                            <li><a class="dropdown-item" href="{% url 'main:contacts' %}">Контактная информация</a></li>
+                            <li><a class="dropdown-item" href="{% url 'main:about' %}">Про нас</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link  text-white" href="{% url 'users:users_cart' %}">Корзина</a>
+                        <a class="nav-link" href="{% url 'users:users_cart' %}">Корзина</a>
                     </li>
                     {% if not user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'users:login' %}">Войти</a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+                        </li>
                     {% else %}
-                    <li class="nav-item dropdown ">
-                        <a class="nav-link dropdown-toggle text-white" href="#" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            Мой профиль
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item  text-white" href="{% url 'users:profile' %}">Личный кабинет</a>
-                            </li>
-                            {% if user.is_admin or user.is_staff %}
-                            <li><a class="dropdown-item  text-white" href="{% url 'admin:index' %}">Админ панель</a>
-                            </li>
-                            {% endif %}
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item  text-white" href="{% url 'users:logout' %}">Выйти</a></li>
-                        </ul>
-                    </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Мой профиль
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'users:profile' %}">Личный кабинет</a></li>
+                                {% if user.is_admin or user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">Админ панель</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a></li>
+                            </ul>
+                        </li>
                     {% endif %}
                 </ul>
-<!--                Строка поиска-->
-                {% block search %} {% endblock %}
+                {% block search %}{% endblock %}
             </div>
         </div>
     </nav>
 </header>
-<section>
-    <!-- Контент -->
-    <div class="container-fluid main">
-        <div class="row mt-1">
-            {% block content %}{% endblock %}
-        </div>
-    </div>
-</section>
 
-{% block footer %}{% endblock %}
+<main class="main">
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+{% block footer %}
+<footer class="bg-dark text-white text-center py-3 mt-5">
+    <small>&copy; 2025 Electronics. Все права защищены. *Учебный сайт</small>
+</footer>
+{% endblock %}
 
 <script src="{% static 'deps/js/jquery/jquery-3.7.0.min.js' %}"></script>
 <script src="{% static 'deps/js/jquery-ajax.js' %}"></script>
 <script src="{% static 'deps/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
 </body>
-
 </html>
