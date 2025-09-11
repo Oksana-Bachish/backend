@@ -12,26 +12,24 @@
         <div class="">
             {% for item in order_items.all %}
             {% with product=item.product %}
-            <div class="d-flex">
-                <div class="m-0">
+            <div class="d-flex flex-column flex-sm-row mb-3">
+                <div class="me-3 mb-2 mb-sm-0">
                     {% if product.image %}
                     <img src="{{ product.image.url }}" class="card-img-top p-0" alt="{{ product.name }}">
                     {% else %}
                     <img src="{% static 'deps/images/Not_found_image.png' %}" class="card-img-top img-fluid" alt="...">
                     {% endif %}
                 </div>
-                <div>
-                    <div>
-                        <p><strong>{{ product.name }}</strong></p>
-                        <p>Количество: {{ item.quantity }}</p>
-                        {% if product.discount %}
-                        <div class="cart-price">
-                            <p><strong>{{ item.price }} р.</strong></p>
-                        </div>
-                        {% else %}
-                        <p><strong>{{ product.price }} р.</strong></p>
-                        {% endif %}
+                <div class="flex-grow-1">
+                    <p><strong>{{ product.name }}</strong></p>
+                    <p>Количество: {{ item.quantity }}</p>
+                    {% if product.discount %}
+                    <div class="cart-price">
+                        <p><strong>{{ item.price }} р.</strong></p>
                     </div>
+                    {% else %}
+                    <p><strong>{{ product.price }} р.</strong></p>
+                    {% endif %}
                 </div>
             </div>
             {% endwith %}
