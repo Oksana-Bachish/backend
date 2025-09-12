@@ -15,7 +15,8 @@
 - Корзина с динамическим обновлением (AJAX)
 - Оформление заказов с оплатой через Stripe (тестовая интеграция)
 - Перевод на Class-Based Views
-- Автоматическое тестирование с покрытием кода
+- Автоматическое тестирование с покрытием кода (Pytest + Codecov)  
+- CI через GitHub Actions
 - Подключение микросервиса через Django REST Framework.
 - Развёртывание в Docker с использованием Nginx
 - Деплой на VPS-сервер
@@ -33,6 +34,9 @@
 - Nginx  
 - Stripe API  
 - SMTP Yandex  
+- Pytest
+- GitHub Actions
+- Codecov
 
 ### 📸 Скриншоты
 
@@ -84,13 +88,27 @@ touch electronics_store/.env.dev
    
 5. Добавьте в `.env.dev` следующие переменные:
 ```env
-SECRET_KEY=secret_key
-POSTGRES_DB=db_name
-POSTGRES_PASSWORD=password
-POSTGRES_USER=login
+# Django
+SECRET_KEY=your_secret_key
+
+# База данных PostgreSQL
+POSTGRES_DB=your_db_name
+POSTGRES_USER=your_db_user
+POSTGRES_PASSWORD=your_db_password
 POSTGRES_PORT=5432
-STRIPE_SECRET_KEY=key
-STRIPE_API_VERSION=version
+
+# Stripe (платежная система)
+STRIPE_PUBLISHABLE_KEY=your_publishable_key
+STRIPE_SECRET_KEY=your_secret_key
+STRIPE_API_VERSION=your_api_version
+STRIPE_WEBHOOK_SECRET=your_webhook_secret
+
+# Почта для восстановления пароля
+EMAIL_HOST_USER=your_email@example.com
+EMAIL_HOST_PASSWORD=your_email_password
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+
 ```
 
 6. Создайте файл `.env.dev` в папке API-микросервиса:
@@ -100,13 +118,16 @@ touch api/.env.dev
 
 7. Добавьте в него переменные окружения:
 ```env
+# Общие настройки
 DEBUG=False
-SECRET_KEY=secret_key
+SECRET_KEY=your_secret_key
 ALLOWED_HOSTS=localhost 127.0.0.1
 CSRF_TRUSTED_ORIGINS=http://localhost:8001
-POSTGRES_USER=login
-POSTGRES_PASSWORD=password
-POSTGRES_DB=db_name
+
+# База данных PostgreSQL
+POSTGRES_USER=your_db_user
+POSTGRES_PASSWORD=your_db_password
+POSTGRES_DB=your_db_name
 POSTGRES_PORT=5432
 ```
 
