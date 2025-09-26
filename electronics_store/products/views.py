@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.core.cache import cache
 from django.http import Http404
 from django.shortcuts import render
 from django.views.generic import DetailView, ListView
@@ -26,6 +27,11 @@ class CatalogView(ListView):
         access_memory = self.request.GET.getlist('select_access_memory', None)
         main_camera = self.request.GET.getlist('select_main_camera', None)
 
+        cache_key = f"catalog_{category_slug}_{brand}_{color}_{build_memory}_{access_memory}_{main_camera}_{on_sale}_{order_by}_{query}"
+        cache_queryset = cache.get(cache_key)
+        if cache_queryset:
+            return cache_queryset
+
         q_objects = Q()
         if brand:
             q_objects &= Q(brand__name__in=brand)
@@ -41,7 +47,7 @@ class CatalogView(ListView):
             q_objects &= Q(characteristics__main_camera__in=main_camera)
         q_objects &= Q(category__slug=category_slug)
 
-        products = super().get_queryset().filter(q_objects)
+        products = super().get_queryset().select_related('brand', 'category', 'characteristics').filter(q_objects)
 
         if query:
             products = q_search(query, category_slug)
@@ -50,6 +56,8 @@ class CatalogView(ListView):
             products = products.filter(discount__gt=0)
         if order_by and order_by != 'default':
             products = products.order_by(order_by)
+
+        cache.set(cache_key, products, timeout=60 * 5)
 
         return products
 
@@ -66,7 +74,16 @@ class ProductView(DetailView):
     context_object_name = 'product'
 
     def get_object(self, queryset=None):
-        product = Products.objects.get(slug=self.kwargs.get('product_slug'))
+        product_slug = self.kwargs.get(self.slug_url_kwarg)
+
+        cache_key = f'product_{product_slug}'
+        product = cache.get(cache_key)
+
+        if not product:
+            product = Products.objects.select_related('brand', 'category', 'characteristics').get(
+                slug=self.kwargs.get('product_slug'))
+            cache.set(cache_key, product, 600)
+
         return product
 
     def get_context_data(self, **kwargs):
