@@ -11,6 +11,7 @@ from django.views.generic import FormView
 from baskets.models import Basket
 from orders.forms import CreateOrderForm
 from orders.models import Order, OrderItem
+from products.models import Products
 
 
 class CreateOrderView(LoginRequiredMixin, FormView):
@@ -42,7 +43,7 @@ class CreateOrderView(LoginRequiredMixin, FormView):
 
                     # Создать заказанные товары
                     for basket_item in basket_items:
-                        product = basket_item.product
+                        product = Products.objects.select_for_update().get(id=basket_item.product.id)
                         name = basket_item.product.name
                         price = basket_item.product_price()
                         quantity = basket_item.quantity
