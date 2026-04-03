@@ -134,7 +134,7 @@ def test_user_profile_update(client):
     assert user.first_name == 'Ivan'
     assert user.email == 'update_test@mail.ru'
     messages = list(get_messages(response.wsgi_request))
-    assert any('Профайл успешно создан' in str(m.message) for m in messages)
+    assert any('Профайл успешно обновлен' in str(m.message) for m in messages)
 
 
 @pytest.mark.django_db

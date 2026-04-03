@@ -75,7 +75,7 @@ class UserProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def form_valid(self, form):
-        messages.success(self.request, "Профайл успешно создан")
+        messages.success(self.request, "Профайл успешно обновлен")
         return super().form_valid(form)
 
     def form_invalid(self, form):
