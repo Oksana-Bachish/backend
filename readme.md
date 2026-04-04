@@ -1,7 +1,7 @@
 # Electronics Store
 
 [![CI](https://github.com/Oksana-Bachish/backend/actions/workflows/tests.yml/badge.svg)](https://github.com/Oksana-Bachish/backend/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/oksana-bachish/backend/branch/main/graph/badge.svg)](https://codecov.io/gh/oksana-bachish/backend)
+[![codecov](https://codecov.io/gh/oksana-bachish/backend/graph/badge.svg?token=FDA59YE3BN)](https://codecov.io/gh/oksana-bachish/backend)
 
 # Интернет магазин Electronics_store
 Это полноценный проект интернет-магазина, разработанный на Django. Выполнен как учебный проект в процессе самообучения. 
