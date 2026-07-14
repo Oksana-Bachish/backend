@@ -20,7 +20,7 @@
 - Подключение микросервиса через Django REST Framework.
 - Развёртывание в Docker с использованием Nginx
 - Деплой на VPS-сервер
-- Зарегистрировано доменное имя: `electronics7.ru`
+- Зарегистрировано доменное имя: `electronics24.store`
 - Подключен SSL-сертификат для HTTPS
 
 ### 🛠️ Стек технологий
@@ -152,8 +152,8 @@ docker compose up
 
 Проект развёрнут на VPS-сервере. Настроено проксирование, а также сервировка статических и медиафайлов через Nginx. Созданы Docker-тома для хранения данных.
 
-**Сайт:** https://electronics7.ru  
-**API**: https://electronics7.ru/api/v1/products/
+**Сайт:** https://electronics24.store  
+**API**: https://electronics24.store/api/v1/products/
 
 ### 👩‍💻 Автор:
 *Оксана Бачиш*  
