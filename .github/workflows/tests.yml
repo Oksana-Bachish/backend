@@ -31,7 +31,7 @@ jobs:
           EOF
 
       - name: Build Docker image
-        run: docker compose -f compose.yml build
+        run: docker compose -f compose.yml build web
 
       - name: Ensure logs folder volume
         run: |
