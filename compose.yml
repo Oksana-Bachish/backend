@@ -58,6 +58,20 @@ services:
     networks:
       - dev
 
+  fastapi_recommend:
+    build:
+      context: ../recommend
+      dockerfile: Dockerfile
+    container_name: local_fastapi_app
+    ports:
+      - '8085:8000'
+    env_file:
+      ../recommend/.env.dev
+    volumes:
+      - ../recommend:/app
+    networks:
+      - dev
+
 volumes:
   data:
   static_volume:

@@ -18,6 +18,7 @@
 - Автоматическое тестирование с покрытием кода (Pytest + Codecov)  
 - CI через GitHub Actions
 - Подключение микросервиса через Django REST Framework.
+- Интеграция внешнего асинхронного микросервиса рекомендаций товаров, построенного на FastAPI и PostgreSQL.
 - Развёртывание в Docker с использованием Nginx
 - Деплой на VPS-сервер
 - Зарегистрировано доменное имя: `electronics24.store`
@@ -26,8 +27,8 @@
 ### 🛠️ Стек технологий
 
 - Python 3.10  
-- Django  
-- PostgreSQL  
+- Django / FastAPI 
+- PostgreSQL (Asyncpg)  
 - Django ORM  
 - Django REST Framework  
 - Docker + Docker Compose  
