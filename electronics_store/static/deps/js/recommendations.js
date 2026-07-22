@@ -8,7 +8,7 @@
     let apiBase = 'http://127.0.0.1:8085'
 
     if (window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost') {
-        apiBase = 'https://electronics24.store:8085';
+        apiBase = 'https://electronics24.store';
     }
 
     const url = apiBase + "/recommendations/" + productSlug;
@@ -30,7 +30,7 @@
                 listContainer.innerHTML += `
                     <div class="col">
                         <div class="card h-100 shadow-sm" style="border-radius: 8px; overflow: hidden;">
-                            <a href="/product/${item.product_slug}/" class="text-decoration-none text-dark">
+                            <a href="/products/product/${item.slug}/" class="text-decoration-none text-dark">
                                 <img src="/media/${item.image}" class="card-img-top p-3" style="height: 180px; object-fit: contain;" alt="${item.name}">
                                 <div class="card-body text-center">
                                     <h5 class="card-title fw-bold fs-6 text-truncate" title="${item.name}">${item.name}</h5>
