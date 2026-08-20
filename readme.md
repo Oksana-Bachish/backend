@@ -10,7 +10,7 @@
 
 - Админ-панель Django
 - Кастомная регистрация и личный кабинет пользователя
-- Восстановление пароля через email (SMTP Yandex)
+- **Асинхронное восстановление пароля через email**: интеграция Celery и RabbitMQ для выноса отправки писем (SMTP Yandex) в фоновые задачи без блокировки основного потока приложения.
 - Фильтрация, сортировка и поиск товаров
 - Корзина с динамическим обновлением (AJAX)
 - Оформление заказов с оплатой через Stripe (тестовая интеграция)
@@ -31,6 +31,7 @@
 - PostgreSQL (Asyncpg)  
 - Django ORM  
 - Django REST Framework  
+- Celery / RabbitMQ 
 - Docker + Docker Compose  
 - Nginx  
 - Stripe API  
@@ -109,6 +110,11 @@ EMAIL_HOST_USER=your_email@example.com
 EMAIL_HOST_PASSWORD=your_email_password
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
+
+# Очереди задач Celery и брокер RabbitMQ
+RABBITMQ_DEFAULT_USER=your_rabbitmq_user
+RABBITMQ_DEFAULT_PASS=your_rabbitmq_password
+CELERY_BROKER_URL=amqp://your_rabbitmq_user:your_rabbitmq_password@rabbitmq:5672//
 
 ```
 

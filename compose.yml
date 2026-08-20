@@ -72,11 +72,39 @@ services:
     networks:
       - dev
 
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    env_file:
+      - ./electronics_store/.env.dev
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - dev
+
+  celery_worker:
+    build: ./electronics_store
+    container_name: celery_worker
+    command: celery -A electronics_store worker -E --loglevel=info --pool=solo
+    env_file:
+      - ./electronics_store/.env.dev
+    depends_on:
+      - db
+      - rabbitmq
+    volumes:
+      - ./electronics_store:/usr/src/electronics_store
+    networks:
+      - dev
+
 volumes:
   data:
   static_volume:
   static_api_volume:
   media_volume:
+  rabbitmq_data:
 
 networks:
   dev:

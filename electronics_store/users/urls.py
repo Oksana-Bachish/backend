@@ -2,6 +2,7 @@ from django.urls import path, reverse_lazy
 from users import views
 from django.contrib.auth.views import LogoutView, PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, \
     PasswordResetCompleteView
+from users.forms import CeleryPasswordResetForm
 
 app_name = 'users'
 
@@ -11,7 +12,8 @@ urlpatterns = [
     path('profile/', views.UserProfileView.as_view(), name='profile'),
     path('users-cart/', views.UsersCartView.as_view(), name='users_cart'),
     path('logout/', views.logout, name='logout'),
-    path('password-reset/', PasswordResetView.as_view(template_name='users/password_reset_form.html',
+    path('password-reset/', PasswordResetView.as_view(form_class=CeleryPasswordResetForm,
+                                                      template_name='users/password_reset_form.html',
                                                       email_template_name='users/password_reset_email.html',
                                                       success_url=reverse_lazy('users:password_reset_done')),
          name='password_reset'),

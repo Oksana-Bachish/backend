@@ -27,15 +27,21 @@ services:
       - STRIPE_WEBHOOK_SECRET=/run/secrets/stripe_webhook_secret
       - EMAIL_PORT=${EMAIL_PORT}
       - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-      - EMAIL_HOST_PASSWORD==/run/secrets/email_host_password
+      - EMAIL_HOST_PASSWORD=/run/secrets/email_host_password
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_HOST=rabbitmq
     secrets:
       - pg_password
       - stripe_publishable_key
       - stripe_secret_key
       - stripe_webhook_secret
       - email_host_password
+      - rabbitmq_password
     depends_on:
-      - db
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - app_net
 
@@ -98,6 +104,54 @@ services:
     networks:
       - app_net
 
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=/run/secrets/rabbitmq_password
+    secrets:
+      - rabbitmq_password
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - app_net
+
+  celery_worker:
+    build:
+      context: ./electronics_store
+      dockerfile: Dockerfile.prod
+    image: web_prod:1.0.0
+    command: celery -A electronics_store worker --loglevel=info --concurrency=2
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_PASSWORD=/run/secrets/pg_password
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=/run/secrets/email_host_password
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_HOST=rabbitmq
+    secrets:
+      - pg_password
+      - email_host_password
+      - rabbitmq_password
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - app_net
+
 secrets:
   pg_password:
     file: ./sets/pg_secret_password.txt
@@ -109,12 +163,15 @@ secrets:
     file: ./sets/stripe_webhook_secret.txt
   email_host_password:
     file: ./sets/email_host_password.txt
+  rabbitmq_password:
+    file: ./sets/rabbitmq_password.txt
 
 volumes:
   data:
   static_volume:
   static_api_volume:
   media_volume:
+  rabbitmq_data:
 
 networks:
   app_net:
