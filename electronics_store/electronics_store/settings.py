@@ -108,10 +108,22 @@ DATABASES = {
     }
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION": BASE_DIR / 'cache',
+TESTING = any('pytest' in arg for arg in sys.argv) and not any('celery' in arg for arg in sys.argv)
+
+REDIS_HOST = 'redis'
+
+if TESTING:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': f'redis://{REDIS_HOST}:6379/1',
     }
 }
 
@@ -182,8 +194,6 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
 X_FRAME_OPTIONS = 'DENY'
-
-TESTING = any('pytest' in arg for arg in sys.argv) and not any('celery' in arg for arg in sys.argv)
 
 if TESTING:
     CELERY_TASK_ALWAYS_EAGER = True

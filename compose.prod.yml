@@ -152,6 +152,14 @@ services:
     networks:
       - app_net
 
+  redis:
+    image: redis:7.2-alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - app_net
+
 secrets:
   pg_password:
     file: ./sets/pg_secret_password.txt
@@ -172,6 +180,7 @@ volumes:
   static_api_volume:
   media_volume:
   rabbitmq_data:
+  redis_data:
 
 networks:
   app_net:
