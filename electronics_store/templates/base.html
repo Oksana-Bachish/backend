@@ -11,6 +11,7 @@
     <!-- Bootstrap & Custom Styles -->
     <link rel="stylesheet" href="{% static 'deps/css/bootstrap/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'deps/css/my_css.css' %}">
+    <link rel="stylesheet" href="{% static 'deps/css/ai_chat.css' %}">
     {% block css %}{% endblock %}
 
     <!-- Favicons -->
@@ -87,5 +88,7 @@
 <script src="{% static 'deps/js/jquery-ajax.js' %}"></script>
 <script src="{% static 'deps/js/bootstrap/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'deps/js/recommendations.js' %}"></script>
+<script src="{% static 'deps/js/ai_chat.js' %}"></script>
+{% include 'includes/ai_chat_widget.html' %}
 </body>
 </html>

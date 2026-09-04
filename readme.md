@@ -19,7 +19,8 @@
 - Автоматическое тестирование с покрытием кода (Pytest + Codecov)  
 - CI через GitHub Actions
 - Подключение микросервиса через Django REST Framework.
-- Интеграция внешнего асинхронного микросервиса рекомендаций товаров, построенного на FastAPI и PostgreSQL.
+- **Интеграция внешнего асинхронного микросервиса рекомендаций товаров**, построенного на FastAPI и PostgreSQL.
+- **Интеграция LLM-агента**: асинхронный микросервис на FastAPI для контекстного подбора техники из каталога на базе моделей OpenAI.
 - Развёртывание в Docker с использованием Nginx
 - Деплой на VPS-сервер
 - Зарегистрировано доменное имя: `electronics24.store`
@@ -27,8 +28,9 @@
 
 ### 🛠️ Стек технологий
 
-- Python 3.10  
+- Python 3.10 / 3.11 
 - Django / FastAPI 
+- OpenAI SDK (`AsyncOpenAI`) / Pydantic v2
 - PostgreSQL (Asyncpg) /  Redis
 - Django ORM  
 - Django REST Framework  

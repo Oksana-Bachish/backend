@@ -1,9 +1,13 @@
+import json
+import os
+import requests
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.core.cache import cache
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import render
 from django.views.generic import DetailView, ListView
+from django.views.decorators.csrf import csrf_exempt
 
 from products.models import Products
 from products.utils import q_search
@@ -93,6 +97,68 @@ class ProductView(DetailView):
         context['title'] = self.object.name
         return context
 
+
+def ai_consultant_view(request):
+    """
+    Принимает запрос от JS‑виджета и пересылает его в FastAPI‑микросервис.
+    Возвращает ответ ИИ обратно на фронтенд.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Метод не разрешен'})
+
+    try:
+#       # 1. Читаем JSON из fetch-запроса
+        data = json.loads(request.body)
+        user_query = data.get('message')
+        if not user_query:
+            return JsonResponse({'status': 'error', 'message': 'Пустой запрос'}),
+
+        # 2. Получаем товары из БД (ограничиваем топ-15)
+        db_products = Products.objects.filter(
+            category__name__in=["Смартфоны", "Ноутбуки", "Планшеты"],
+            quantity__gt=0
+        )[:15]
+
+        # 3. Приводим товары к формату, ожидаемому FastAPI
+        products_payload = []
+        for p in db_products:
+            products_payload.append({
+                'id': p.id,
+                'name': p.name,
+                'price': float(p.price)
+            })
+
+        # 4. Формируем URL микросервиса (Docker/локально)
+        FASTAPI_HOST = os.getenv('FASTAPI_AI_HOST', 'http://localhost:8001')
+        fastapi_url = f'{FASTAPI_HOST}/api/v1/consult/'
+
+        # 5. Отправляем запрос в FastAPI
+        fastapi_response = requests.post(
+            fastapi_url,
+            json={
+                'query': user_query,
+                'products': products_payload
+            },
+            timeout=30
+        )
+
+        # 6. Возвращаем ответ ИИ на фронтенд
+        if fastapi_response.status_code == 200:
+            ai_data = fastapi_response.json()
+            return JsonResponse({
+                'status': 'success',
+                'response': ai_data.get('response', 'Робот задумался...')
+            })
+        else:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Микросервис вернул ошибку {fastapi_response.status_code}'
+            }, status=500)
+
+    except requests.exceptions.Timeout:
+        return JsonResponse({'status': 'error', 'message': 'ИИ слишком долго думал'}, status=500)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Ошибка бэкенда: {str(e)}'}, status=500)
 
 
 # Функциональные представления
