@@ -3,10 +3,14 @@ FROM python:3.10-slim
 WORKDIR /usr/src/electronics_store
 
 RUN pip install --upgrade pip
-RUN apt-get update && apt-get install -y libpq-dev build-essential && apt-get install -y netcat-openbsd && apt-get install -y dos2unix && rm -rf /var/lib/apt/lists/
+RUN apt-get update && \
+    apt-get install -y libpq-dev build-essential netcat-openbsd dos2unix && \
+    rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir uv
+
+COPY pyproject.toml .
+RUN uv pip install --system --no-cache -e ".[dev]"
 
 COPY . .
 
