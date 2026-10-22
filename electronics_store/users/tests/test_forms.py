@@ -1,6 +1,16 @@
 import pytest
 from django.contrib.auth import get_user_model
+from django.core import mail
+from django.conf import settings
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+
+from unittest.mock import patch
+
 from users.forms import UserLoginForm, UserRegistrationForm, ProfileForm
+from users.forms import CeleryPasswordResetForm
+from users.models import User
 
 UserModel = get_user_model()
 
@@ -56,3 +66,37 @@ def test_profile_form_valid():
         'email': 'new@example.com',
     })
     assert form.is_valid()
+
+
+@pytest.mark.django_db
+def test_celery_password_reset_form_sends_task():
+    user = User.objects.create_user(username='testuser', email='user@example.com', password='password123')
+
+    uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+
+    with patch('users.forms.send_password_reset_email_task.delay') as mock_delay:
+        context = {
+            'user': user,
+            'url': 'http://test.com',
+            'uid': uidb64,
+            'uidb64': uidb64,
+            'token': token,
+        }
+
+        form = CeleryPasswordResetForm()
+
+        form.send_mail(
+            subject_template_name='users/password_reset_form.html',
+            email_template_name='users/password_reset_email.html',
+            context=context,
+            from_email='webmaster@localhost',
+            to_email=user.email
+        )
+
+        assert mock_delay.call_count == 1
+        kwargs = mock_delay.call_args.kwargs
+        assert kwargs['from_email'] == 'webmaster@localhost'
+        assert kwargs['recipient_list'] == [user.email]
+        assert 'subject' in kwargs
+        assert 'message' in kwargs
