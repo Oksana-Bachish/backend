@@ -1,7 +1,9 @@
 import pytest
+import json
+import requests
+from unittest.mock import patch, MagicMock
 from django.urls import reverse
 from products.models import Products, Categories, Brands, Characteristics
-from products.views import CatalogView, ProductView
 
 pytestmark = pytest.mark.django_db
 
@@ -82,3 +84,66 @@ def test_product_view(client, sample_product):
     response = client.get(url)
     assert response.status_code == 200
     assert b'Huawei Mate X6' in response.content
+
+
+@pytest.mark.django_db
+@patch('requests.post')
+def test_ai_consultant_view_success(mock_post, client, sample_product):
+    """Успешный сценарий: Django собрал товары из БД и успешно вызвал FastAPI"""
+
+    # Настройка mock-ответа от FastAPI микросервиса
+    mock_response = MagicMock()
+    mock_response.status_code =200
+    mock_response.json.return_value = {'status': 'success', 'response': 'Рекомендую этот смартфон! 📱'}
+    mock_post.return_value = mock_response
+
+    # Имитация запроса от фронтенда
+    url = reverse('products:ai_consultant')
+    payload = {'message': 'Посоветуй телефон'}
+
+    response = client.post(
+        url,
+        data = json.dumps(payload),
+        content_type='application/json'
+    )
+
+    # Проверка ответа Django View для фронтенда
+    assert response.status_code == 200
+    json_data = response.json()
+    assert json_data['status'] == 'success'
+    assert json_data['response'] == 'Рекомендую этот смартфон! 📱'
+
+    # Проверка параметров исходящего запроса к микросервису
+    assert mock_post.called
+    called_kwargs = mock_post.call_args.kwargs
+    assert called_kwargs['timeout'] == 30
+
+    # Валидация структуры передаваемых данных (RAG контекст)
+    sent_json = called_kwargs['json']
+    assert sent_json['query'] == 'Посоветуй телефон'
+    assert len(sent_json['products']) == 1
+    assert sent_json['products'][0]['name'] == 'Huawei Mate X6'
+
+
+@pytest.mark.django_db
+@patch('requests.post')
+def test_ai_consultant_view_timeout(mock_post, client):
+    """Сценарий ошибки: микросервис ИИ завис, и Django выбросил Timeout"""
+
+    # Имитация таймаута сети при запросе к FastAPI
+    mock_post.side_effect = requests.exceptions.Timeout('ИИ слишком долго думал')
+
+    url = reverse('products:ai_consultant')
+    payload = {'message': 'Посоветуй телефон'}
+
+    response = client.post(
+        url,
+        data=json.dumps(payload),
+        content_type='application/json'
+    )
+
+    # Проверка обработки исключения и возврата ошибки 500
+    assert response.status_code == 500
+    json_data = response.json()
+    assert json_data['status'] == 'error'
+    assert json_data['message'] == 'ИИ слишком долго думал'
