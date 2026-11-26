@@ -1,6 +1,7 @@
 import json
 import os
 import requests
+import logging
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.core.cache import cache
@@ -10,7 +11,7 @@ from django.views.generic import DetailView, ListView
 from django.views.decorators.csrf import csrf_exempt
 
 from products.models import Products
-from products.utils import q_search
+from products.utils import q_search, ai_product_search
 
 
 class CatalogView(ListView):
@@ -51,7 +52,7 @@ class CatalogView(ListView):
             q_objects &= Q(characteristics__main_camera__in=main_camera)
         q_objects &= Q(category__slug=category_slug)
 
-        products = super().get_queryset().select_related('brand', 'category', 'characteristics')\
+        products = super().get_queryset().select_related('brand', 'category', 'characteristics') \
             .prefetch_related('images').filter(q_objects)
 
         if query:
@@ -85,8 +86,8 @@ class ProductView(DetailView):
         product = cache.get(cache_key)
 
         if not product:
-            product = Products.objects.select_related('brand', 'category', 'characteristics')\
-                .prefetch_related('images')\
+            product = Products.objects.select_related('brand', 'category', 'characteristics') \
+                .prefetch_related('images') \
                 .get(slug=self.kwargs.get('product_slug'))
             cache.set(cache_key, product, 600)
 
@@ -98,37 +99,56 @@ class ProductView(DetailView):
         return context
 
 
+logger = logging.getLogger(__name__)
+
+FALLBACK_UI_RESPONSE = (
+    'Сейчас ИИ-помощник немного занят 🤖 Попробуйте повторить вопрос через минуту '
+    'или воспользуйтесь удобным поиском по нашему каталогу!'
+)
+
+
+def _get_client_ip(request) -> str:
+    """Извлекает реальный IP пользователя (с учетом прокси/Nginx)."""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        return x_forwarded_for.split(',')[0].strip()
+    return request.META.get('REMOTE_ADDR', 'unknown')
+
+
 def ai_consultant_view(request):
-    """
-    Принимает запрос от JS‑виджета и пересылает его в FastAPI‑микросервис.
-    Возвращает ответ ИИ обратно на фронтенд.
-    """
+    """Принимает вопрос с фронтенда, подбирает релевантные товары и запрашивает ответ у AI-сервиса."""
     if request.method != 'POST':
-        return JsonResponse({'status': 'error', 'message': 'Метод не разрешен'})
+        return JsonResponse({'status': 'error', 'message': 'Метод не разрешен'}, status=405)
+
+    # 1. Защита от автоботов (Rate Limiting: максимум 5 запросов в минуту с одного IP)
+    client_ip = _get_client_ip(request)
+    rate_key = f'ai_rate_limit:{client_ip}'
+    request_count = cache.get(rate_key, 0)
+
+    if request_count >= 5:
+        return JsonResponse({
+            'status': 'success',
+            'response': 'Вы отправляете сообщения слишком быстро 😅 Пожалуйста, подождите минуту перед следующим вопросом.'
+        })
+    cache.set(rate_key, request_count + 1, timeout=60)
 
     try:
-#       # 1. Читаем JSON из fetch-запроса
+        # 2. Валидация входного запроса
         data = json.loads(request.body)
-        user_query = data.get('message')
-        if not user_query:
-            return JsonResponse({'status': 'error', 'message': 'Пустой запрос'}),
+        user_query = (data.get('message') or "").strip()
 
-        # 2. Получаем товары из БД (ограничиваем топ-15)
-        db_products = Products.objects.filter(
-            category__name__in=["Смартфоны", "Ноутбуки", "Планшеты"],
-            quantity__gt=0
-        )[:15]
+        if len(user_query) < 2:
+            return JsonResponse({'status': 'success', 'response': 'Пожалуйста, напишите вопрос чуть подробнее '
+                                                                  '(минимум 2 символа) 😊'})
+        if len(user_query) > 500:
+            return JsonResponse({'status': 'success', 'response': 'Ого, какой длинный текст! 😅 Пожалуйста, '
+                                                                  'сформулируйте вопрос покороче (до 500 символов), '
+                                                                  'чтобы я быстрее подобрал технику.'})
 
-        # 3. Приводим товары к формату, ожидаемому FastAPI
-        products_payload = []
-        for p in db_products:
-            products_payload.append({
-                'id': p.id,
-                'name': p.name,
-                'price': float(p.price)
-            })
+        # 3. Подбор релевантных товаров через полнотекстовый поиск PostgreSQL
+        products_payload = ai_product_search(user_query)
 
-        # 4. Формируем URL микросервиса (Docker/локально)
+        # 4. Запрос в микросервис FastAPI
         FASTAPI_HOST = os.getenv('FASTAPI_AI_HOST', 'http://localhost:8001')
         fastapi_url = f'{FASTAPI_HOST}/api/v1/consult/'
 
@@ -139,27 +159,25 @@ def ai_consultant_view(request):
                 'query': user_query,
                 'products': products_payload
             },
-            timeout=30
+            timeout=20
         )
 
-        # 6. Возвращаем ответ ИИ на фронтенд
         if fastapi_response.status_code == 200:
             ai_data = fastapi_response.json()
             return JsonResponse({
                 'status': 'success',
-                'response': ai_data.get('response', 'Робот задумался...')
+                'response': ai_data.get('response', FALLBACK_UI_RESPONSE)
             })
-        else:
-            return JsonResponse({
-                'status': 'error',
-                'message': f'Микросервис вернул ошибку {fastapi_response.status_code}'
-            }, status=500)
+
+        logger.warning(f'FastAPI вернул статус {fastapi_response.status_code}')
+        return JsonResponse({'status': 'success', 'response': FALLBACK_UI_RESPONSE})
 
     except requests.exceptions.Timeout:
-        return JsonResponse({'status': 'error', 'message': 'ИИ слишком долго думал'}, status=500)
+        logger.warning('Таймаут при обращении к AI-микросервису')
+        return JsonResponse({'status': 'success', 'response': FALLBACK_UI_RESPONSE})
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': f'Ошибка бэкенда: {str(e)}'}, status=500)
-
+        logger.exception(f'Ошибка во вьюхе AI-консультанта: {e}')
+        return JsonResponse({'status': 'success', 'response': FALLBACK_UI_RESPONSE})
 
 # Функциональные представления
 

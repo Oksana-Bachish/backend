@@ -1,5 +1,8 @@
 from django.db import models
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVector
 from django.urls import reverse
+from django.db.models.functions import Coalesce
 
 
 class Categories(models.Model):
@@ -31,6 +34,13 @@ class Brands(models.Model):
         return self.name
 
 
+PRODUCT_SEARCH_VECTOR = SearchVector('name', weight='A', config='russian') + SearchVector(
+    Coalesce('description', models.Value(''), output_field=models.TextField()),
+    weight='B',
+    config='russian',
+)
+
+
 class Products(models.Model):
     name = models.CharField(max_length=300, unique=True, verbose_name='Название')
     slug = models.SlugField(max_length=250, unique=True, blank=True, null=True, verbose_name='URL')
@@ -50,6 +60,10 @@ class Products(models.Model):
         indexes = [
             models.Index(fields=['id', 'slug']),
             models.Index(fields=['name']),
+            GinIndex(
+                PRODUCT_SEARCH_VECTOR,
+                name='product_ai_search_gin_idx'
+            )
         ]
 
     def __str__(self):
